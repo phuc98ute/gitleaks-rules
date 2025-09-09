@@ -1,0 +1,57 @@
+title = "Custom Gitleaks Config"
+
+# This is the default Gitleaks rules configuration.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "azure-tenant-client-id"
+description = "Azure Tenant or Client ID"
+regex = '''(?:String\s+)?(?:tenant|directory|client)(?:id|Id|ID|-id|-ID)(?:\s*[:|=]\s*|Id?\s*=\s*)["']?([a-fA-F0-9\-]{36})["']?'''
+tags = ["key", "Azure"]
+secretGroup = 1
+
+[[rules]]
+id = "azure-service-key"
+description = "Azure Service API Key (generic)"
+regex = '''(?i)(AzureKeyCredential\s*\(\s*["'][A-Za-z0-9+/=]{20,}["']\s*\))'''
+tags = ["key", "azure", "secret"]
+
+[[rules]]
+id = "env-file-secrets"
+description = "Environment File Secret Pattern"
+file = '''(?i)\.(env|properties|ya?ml|xml|json|cfg|conf|ini|config)$'''
+regex = '''(?i)["']?(?:user|username|usr|password|passwd|pwd|pass|secret|token|key|credential|client|managed-identity)(?:[-_][a-zA-Z0-9]+)?["']?\s*[:|=]\s*["']?([^"'\s]{5,})["']?'''
+tags = ["key", "config"]
+secretGroup = 1
+
+[[rules]]
+id = "common-hardcoded-secrets"
+description = "Common Hardcoded Secret Pattern"
+regex = '''(?i)(?:String|final\s+String)\s+\w*(?:user|username|usr|password|passwd|pwd|pass|secret|token|key|credential|client|managed-identity)\w*\s*=\s*["']([^"']{3,})["']'''
+tags = ["key", "java", "hardcoded"]
+secretGroup = 1
+entropy = 3
+
+[[rules]]
+id = "variable-string-entropy"
+description = "Detect variable assignments with high-entropy string values"
+regex = '''(?i)([A-Za-z0-9_-]+\s*(=|:)\s*["'][^"']{8,}["'])'''
+entropy = 5.0
+secretGroup = 1
+
+# Certificate/PEM file content
+[[rules]]
+id = "private-key-content"
+description = "Private Key Content"
+regex = '''(?i)-----BEGIN (?:RSA|DSA|EC|OPENSSH) PRIVATE KEY(?:-{5})'''
+tags = ["key", "private"]
+
+[[rules]]
+id = "general-access-token"
+description = "Detects hardcoded access tokens in various contexts"
+regex = '''["']access_token["']\s*[,:=]\s*["']([A-Za-z0-9_\-]{20,})["']'''
+secretGroup = 1
+entropy = 3.5
+entropyGroup = 1
+tags = ["access-token", "credentials"]
