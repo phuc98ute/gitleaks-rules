@@ -1,0 +1,14 @@
+# .pre-commit-hooks.yaml
+- id: gitleaks
+  name: gitleaks scan
+  entry: gitleaks detect --no-banner --redact --config gitleaks.toml
+  language: golang
+  types: [file]
+  pass_filenames: false
+
+- id: detect-secrets
+  name: detect-secrets scan
+  entry: detect-secrets scan --baseline secrets.baseline
+  language: python
+  types: [file]
+  pass_filenames: false
